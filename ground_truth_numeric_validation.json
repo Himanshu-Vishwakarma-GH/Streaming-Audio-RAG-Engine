@@ -1,7 +1,7 @@
 [
   {
     "query_id": "q1",
-    "audio_file": "query_01_atc_squawk.wav",
+    "sector": "Air Traffic Control",
     "intent": "transponder_squawk_code",
     "expected_numeric_values": [
       7700
@@ -9,11 +9,93 @@
   },
   {
     "query_id": "q2",
-    "audio_file": "query_02_reactor_pressure.wav",
+    "sector": "Industrial Safety",
     "intent": "reactor_mawp_threshold",
     "expected_numeric_values": [
       450.0,
       485.5
+    ]
+  },
+  {
+    "query_id": "q3",
+    "sector": "Air Traffic Control",
+    "intent": "altitude_separation",
+    "expected_numeric_values": [
+      3.0,
+      5.0,
+      10000.0
+    ]
+  },
+  {
+    "query_id": "q4",
+    "sector": "911 Emergency Dispatch",
+    "intent": "cpr_compression_ratio",
+    "expected_numeric_values": [
+      30,
+      2,
+      100,
+      120,
+      2.0
+    ]
+  },
+  {
+    "query_id": "q5",
+    "sector": "911 Emergency Dispatch",
+    "intent": "severe_bleeding_tourniquet",
+    "expected_numeric_values": [
+      2.0,
+      3.0
+    ]
+  },
+  {
+    "query_id": "q6",
+    "sector": "911 Emergency Dispatch",
+    "intent": "pediatric_seizure_protocol",
+    "expected_numeric_values": [
+      5.0,
+      1
+    ]
+  },
+  {
+    "query_id": "q7",
+    "sector": "Police Department",
+    "intent": "active_shooter_containment",
+    "expected_numeric_values": [
+      2,
+      4,
+      300.0
+    ]
+  },
+  {
+    "query_id": "q8",
+    "sector": "Police Department",
+    "intent": "officer_distress_codes",
+    "expected_numeric_values": [
+      10,
+      33,
+      10,
+      78,
+      10,
+      99,
+      1
+    ]
+  },
+  {
+    "query_id": "q9",
+    "sector": "Fire Department",
+    "intent": "high_rise_fire_staging",
+    "expected_numeric_values": [
+      2,
+      100.0,
+      2.5
+    ]
+  },
+  {
+    "query_id": "q10",
+    "sector": "Fire Department",
+    "intent": "hazmat_bleve_isolation",
+    "expected_numeric_values": [
+      1.0
     ]
   }
 ]

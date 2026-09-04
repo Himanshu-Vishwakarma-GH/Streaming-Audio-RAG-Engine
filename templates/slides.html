@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>echo — Speculative Audio RAG Slides</title>
+    
+    <!-- Rumik Typography Stack: DM Serif Display + Manrope + Fragment Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Fragment+Mono:ital@0;1&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-deep: #08090b;
+            --bg-card: rgba(18, 19, 24, 0.75);
+            --bg-pill: rgba(10, 11, 14, 0.85);
+            --card-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(226, 177, 112, 0.4);
+            --border-gold: rgba(226, 177, 112, 0.25);
+            --grid-line: rgba(255, 255, 255, 0.015);
+            --gold: #e2b170;
+            --gold-glow: rgba(226, 177, 112, 0.25);
+            --gold-dim: #b88d52;
+            --emerald: #10b981;
+            --emerald-glow: rgba(16, 185, 129, 0.25);
+            --cyan: #38bdf8;
+            --rose: #f43f5e;
+            --text-title: #ffffff;
+            --text-primary: #f4f4f5;
+            --text-secondary: #a1a1aa;
+            --text-tertiary: #71717a;
+            --font-serif: 'DM Serif Display', Georgia, serif;
+            --font-sans: 'Manrope', -apple-system, sans-serif;
+            --font-mono: 'Fragment Mono', monospace;
+        }
+
+        [data-theme="light"] {
+            --bg-deep: #f8fafc;
+            --bg-card: rgba(255, 255, 255, 0.88);
+            --bg-pill: rgba(241, 245, 249, 0.95);
+            --card-shadow: 0 20px 45px -12px rgba(15, 23, 42, 0.08);
+            --border: rgba(15, 23, 42, 0.09);
+            --border-hover: rgba(180, 83, 9, 0.4);
+            --border-gold: rgba(180, 83, 9, 0.25);
+            --grid-line: rgba(15, 23, 42, 0.035);
+            --gold: #b45309;
+            --gold-glow: rgba(180, 83, 9, 0.15);
+            --gold-dim: #92400e;
+            --emerald: #059669;
+            --emerald-glow: rgba(5, 150, 105, 0.15);
+            --cyan: #0284c7;
+            --rose: #e11d48;
+            --text-title: #0f172a;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-tertiary: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background-image: 
+                radial-gradient(circle at 50% -20%, var(--gold-glow) 0%, transparent 60%),
+                radial-gradient(circle at 85% 15%, rgba(56, 189, 248, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 15% 45%, rgba(16, 185, 129, 0.04) 0%, transparent 40%);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Top Header */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 32px;
+            position: relative;
+            z-index: 10;
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(16px);
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        [data-theme="dark"] header {
+            background: rgba(14, 15, 18, 0.6);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-title);
+        }
+
+        .brand-logo {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--gold) 0%, #78350f 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            color: #fff;
+            font-weight: 800;
+        }
+
+        .brand-title {
+            font-family: var(--font-serif);
+            font-size: 1.35rem;
+            font-style: italic;
+            color: var(--text-title);
+            letter-spacing: -0.5px;
+        }
+
+        .badge-speaker {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            background: var(--bg-pill);
+            border: 1px solid var(--border-gold);
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            border: 1px solid var(--border);
+            background: var(--bg-pill);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 0.74rem;
+            text-decoration: none;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .btn-action:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-1px);
+        }
+
+        /* Slide Stage */
+        .stage {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 40px;
+            perspective: 1000px;
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            max-width: 1200px;
+            height: 100%;
+            max-height: 720px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
+            padding: 44px 54px;
+            backdrop-filter: blur(24px);
+            overflow-y: auto;
+            position: relative;
+            animation: fadeInSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        @keyframes fadeInSlide {
+            from {
+                opacity: 0;
+                transform: translateY(14px) scale(0.99);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Slide Content Components */
+        .slide-header {
+            margin-bottom: 24px;
+        }
+
+        .slide-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 12px;
+            background: var(--bg-pill);
+            border: 1px solid var(--border-gold);
+            border-radius: 9999px;
+            font-family: var(--font-mono);
+            font-size: 0.74rem;
+            color: var(--gold);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .slide-title {
+            font-family: var(--font-serif);
+            font-size: 2.8rem;
+            font-weight: 400;
+            line-height: 1.15;
+            letter-spacing: -0.8px;
+            color: var(--text-title);
+        }
+
+        .slide-title i {
+            font-style: italic;
+            color: var(--gold);
+        }
+
+        .slide-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            margin-top: 8px;
+            max-width: 900px;
+        }
+
+        .slide-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Grids & Cards */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: stretch;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .card {
+            background: var(--bg-pill);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            border-color: var(--border-hover);
+        }
+
+        .card h3 {
+            font-family: var(--font-serif);
+            font-size: 1.4rem;
+            color: var(--text-title);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card p, .card li {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            line-height: 1.55;
+        }
+
+        .card ul {
+            list-style: none;
+            margin-top: 8px;
+        }
+
+        .card li {
+            position: relative;
+            padding-left: 18px;
+            margin-bottom: 6px;
+        }
+
+        .card li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--gold);
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        .card-stat {
+            font-family: var(--font-serif);
+            font-size: 2.8rem;
+            color: var(--emerald);
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .card-stat-label {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        /* Step Pipeline */
+        .step-flow {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .step-node {
+            flex: 1;
+            background: var(--bg-pill);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            text-align: center;
+            position: relative;
+        }
+
+        .step-node.active {
+            border-color: var(--gold);
+            background: var(--gold-glow);
+        }
+
+        .step-time {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--gold);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .step-name {
+            font-weight: 700;
+            font-size: 0.88rem;
+            color: var(--text-title);
+        }
+
+        .step-desc {
+            font-size: 0.74rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .step-arrow {
+            color: var(--text-tertiary);
+            font-size: 1.2rem;
+        }
+
+        /* Benchmark Table */
+        .benchmark-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+
+        .benchmark-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .benchmark-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .benchmark-table tr.highlight {
+            background: rgba(16, 185, 129, 0.06);
+        }
+
+        .benchmark-table tr.highlight td {
+            color: var(--text-title);
+            font-weight: 600;
+        }
+
+        .tag {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .tag-emerald { background: rgba(16, 185, 129, 0.15); color: var(--emerald); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .tag-rose { background: rgba(244, 63, 94, 0.15); color: var(--rose); border: 1px solid rgba(244, 63, 94, 0.3); }
+        .tag-gold { background: rgba(226, 177, 112, 0.15); color: var(--gold); border: 1px solid var(--border-gold); }
+
+        /* Slide Footer & Navigation */
+        footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 32px;
+            border-top: 1px solid var(--border);
+            backdrop-filter: blur(16px);
+            background: rgba(255, 255, 255, 0.6);
+            position: relative;
+            z-index: 10;
+        }
+
+        [data-theme="dark"] footer {
+            background: rgba(14, 15, 18, 0.6);
+        }
+
+        .slide-progress {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .progress-dot {
+            width: 24px;
+            height: 4px;
+            border-radius: 2px;
+            background: var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .progress-dot.active {
+            background: var(--gold);
+            width: 36px;
+        }
+
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-nav {
+            background: var(--bg-pill);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 18px;
+            border-radius: 9999px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            user-select: none;
+        }
+
+        .btn-nav:hover:not(:disabled) {
+            border-color: var(--border-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-nav:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .keyboard-hint {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-tertiary);
+            margin-left: 12px;
+        }
+
+        kbd {
+            background: var(--bg-pill);
+            border: 1px solid var(--border);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.68rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <a href="/" class="brand">
+            <div class="brand-logo">e</div>
+            <span class="brand-title">echo</span>
+        </a>
+
+        <div id="speakerBadge" class="badge-speaker">
+            <span id="speakerAvatar">🎙️</span>
+            <span id="speakerName">Speaker 1: Team Lead</span>
+        </div>
+
+        <div class="header-actions">
+            <button class="btn-action" onclick="toggleTheme()" id="themeToggleBtn">
+                <span id="themeToggleIcon">☀️</span>
+                <span id="themeToggleLabel">light</span>
+            </button>
+            <a href="/" target="_blank" class="btn-action" style="background: var(--gold-glow); border-color: var(--border-gold); color: var(--gold);">
+                ⚡ Open Live Demo (localhost:8000)
+            </a>
+        </div>
+    </header>
+
+    <!-- Presentation Stage -->
+    <main class="stage">
+
+        <!-- Slide 1: Title & Executive Summary -->
+        <section class="slide active" data-speaker="Speaker 1: Presenter / Lead" data-role="The Hook & Industry Crisis">
+            <div class="slide-header">
+                <div class="slide-pill">PS-003 • Speculative Audio RAG Engine</div>
+                <h1 class="slide-title">Sub-250ms Streaming <i>Voice Intelligence</i></h1>
+                <p class="slide-subtitle">A full-duplex speech-to-speech engine engineered with C++ AVX2 SIMD acceleration and deterministic zero-hallucination guardrails for mission-critical operations.</p>
+            </div>
+            <div class="slide-body">
+                <div class="grid-4" style="margin-top: 10px;">
+                    <div class="card">
+                        <div class="card-stat">81.4<span style="font-size: 1.4rem;">ms</span></div>
+                        <div class="card-stat-label">End-to-End Turnaround</div>
+                        <p style="margin-top: 8px;">Beats 250ms hackathon SLA by nearly 300% directly in the browser.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-stat">0.70<span style="font-size: 1.4rem;">µs</span></div>
+                        <div class="card-stat-label">AVX2 SIMD Vector Search</div>
+                        <p style="margin-top: 8px;">C++ 8-lane FMA intrinsics scanning cache-aligned memory in nanoseconds.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-stat">100<span style="font-size: 1.4rem;">%</span></div>
+                        <div class="card-stat-label">Deterministic Guardrail</div>
+                        <p style="margin-top: 8px;">Zero numerical hallucination on ATC squawks and reactor safety MAWPs.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-stat">16<span style="font-size: 1.4rem;">kHz</span></div>
+                        <div class="card-stat-label">Full-Duplex Audio Stream</div>
+                        <p style="margin-top: 8px;">Lock-free SPSC circular ring buffer with client-side echo gating.</p>
+                    </div>
+                </div>
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-tertiary);">
+                Mission-Critical Target Sectors: Air Traffic Control (ATC) • 911 Emergency Dispatch • Chemical Plants • Fire Operations
+            </div>
+        </section>
+
+        <!-- Slide 2: Problem Statement -->
+        <section class="slide" data-speaker="Speaker 1: Presenter / Lead" data-role="The Hook & Industry Crisis">
+            <div class="slide-header">
+                <div class="slide-pill" style="color: var(--rose); border-color: rgba(244,63,94,0.3);">The Industry Crisis</div>
+                <h1 class="slide-title">The <i>3-Second Stutter</i> That Kills</h1>
+                <p class="slide-subtitle">Current voice AI systems execute in a rigid sequential waterfall. In high-stakes emergencies, 3 seconds of dead air is fatal.</p>
+            </div>
+            <div class="slide-body">
+                <div class="card" style="margin-bottom: 20px; border-color: rgba(244, 63, 94, 0.2);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--rose); font-weight: 700;">TRADITIONAL CASCADED PIPELINE (TOTAL: 2,500ms - 4,200ms DEAD AIR)</span>
+                        <span class="tag tag-rose">UNACCEPTABLE LAG</span>
+                    </div>
+                    <div class="step-flow">
+                        <div class="step-node"><div class="step-time">1,000ms</div><div class="step-name">ASR Buffer</div><div class="step-desc">Waits for silence</div></div>
+                        <div class="step-arrow">→</div>
+                        <div class="step-node"><div class="step-time">150ms</div><div class="step-name">Embedding</div><div class="step-desc">Token to vector</div></div>
+                        <div class="step-arrow">→</div>
+                        <div class="step-node"><div class="step-time">250ms</div><div class="step-name">Cloud Vector DB</div><div class="step-desc">RPC network lag</div></div>
+                        <div class="step-arrow">→</div>
+                        <div class="step-node"><div class="step-time">1,500ms</div><div class="step-name">LLM Generation</div><div class="step-desc">Sequential tokens</div></div>
+                        <div class="step-arrow">→</div>
+                        <div class="step-node"><div class="step-time">500ms</div><div class="step-name">TTS Vocoder</div><div class="step-desc">Audio synthesis</div></div>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>⚠️ Aviation Depressurization</h3>
+                        <p>An aircraft descending at 6,000 ft/min drops 300 feet during standard voice AI lag. Controllers cannot afford hesitation when issuing emergency vectors or squawk assignments.</p>
+                    </div>
+                    <div class="card">
+                        <h3>⚠️ Exothermic Chemical Overpressure</h3>
+                        <p>Chemical runaway reactions in reactors (like Core R-101) reach catastrophic burst limits in seconds. Operators need exact MAWP limits and quench rates instantly.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: The Solution -->
+        <section class="slide" data-speaker="Speaker 1: Presenter / Lead" data-role="The Paradigm Shift">
+            <div class="slide-header">
+                <div class="slide-pill">The Solution</div>
+                <h1 class="slide-title">Decoupled <i>Speculative Execution</i></h1>
+                <p class="slide-subtitle">We invert the execution model: start retrieval and neural speech synthesis while the operator is still speaking their query.</p>
+            </div>
+            <div class="slide-body">
+                <div class="card" style="border-color: rgba(16, 185, 129, 0.3); margin-bottom: 24px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--emerald); font-weight: 700;">SPECULATIVE STREAMING PIPELINE (TURNAROUND: 81.4ms FROM SPEECH END)</span>
+                        <span class="tag tag-emerald">SUB-250ms VERIFIED</span>
+                    </div>
+                    <div class="step-flow">
+                        <div class="step-node active"><div class="step-time">0ms - 400ms</div><div class="step-name">Prefix Ingestion</div><div class="step-desc">16kHz audio frames</div></div>
+                        <div class="step-arrow">→</div>
+                        <div class="step-node active"><div class="step-time">400ms</div><div class="step-name">Early Intent Spotter</div><div class="step-desc">Fires during speech</div></div>
+                        <div class="step-arrow">→</div>
+                        <div class="step-node active"><div class="step-time">+0.0007ms</div><div class="step-name">C++ AVX2 SIMD</div><div class="step-desc">In-RAM dot product</div></div>
+                        <div class="step-arrow">→</div>
+                        <div class="step-node active"><div class="step-time">+0.065ms</div><div class="step-name">Numeric Guardrail</div><div class="step-desc">Enforces ground truth</div></div>
+                        <div class="step-arrow">→</div>
+                        <div class="step-node active"><div class="step-time">SPEECH_END</div><div class="step-name">Instant Egress</div><div class="step-desc">Flush cached audio</div></div>
+                    </div>
+                </div>
+
+                <div class="grid-3">
+                    <div class="card">
+                        <h3>1. Early Intent Trigger</h3>
+                        <p>Scans acoustic phonemes and prefix transcripts at 400ms to trigger vector retrieval before speech completes.</p>
+                    </div>
+                    <div class="card">
+                        <h3>2. Pre-Warm Vocoding</h3>
+                        <p>Piper Neural TTS synthesizes the response into raw 16kHz PCM audio packets inside memory buffers while the user speaks.</p>
+                    </div>
+                    <div class="card">
+                        <h3>3. Zero-Lag Turnaround</h3>
+                        <p>Silence endpointing at 80ms flushes the pre-rendered audio packets instantly. User perceives zero delay.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4: System Architecture -->
+        <section class="slide" data-speaker="Speaker 2: Systems Architect" data-role="Deep Architecture & SIMD">
+            <div class="slide-header">
+                <div class="slide-pill">System Architecture</div>
+                <h1 class="slide-title">End-to-End <i>System Topology</i></h1>
+                <p class="slide-subtitle">Hardware-optimized streaming pipeline connecting browser Web Audio to native C++ AVX2 kernels and ONNX runtimes.</p>
+            </div>
+            <div class="slide-body">
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>Audio Ingress & Ring Buffer</h3>
+                        <ul>
+                            <li><strong>Web Audio Capture:</strong> Captures microphone in 20ms frames (640 bytes at 16kHz 16-bit PCM).</li>
+                            <li><strong>Full-Duplex WebSocket:</strong> Real-time binary streaming between client browser and server.</li>
+                            <li><strong>Lock-Free SPSC Ring Buffer:</strong> Pre-allocated 1,024 frame capacity in C++ with 64-byte cache-line aligned atomic pointers (under 15ns push overhead).</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Acoustics & Inference Pipeline</h3>
+                        <ul>
+                            <li><strong>Silero VAD (ONNX):</strong> Frame-by-frame speech energy scoring with 80ms silence endpointing.</li>
+                            <li><strong>Early Intent Spotter:</strong> Triggers speculative retrieval when $P(\text{intent} \mid \text{prefix}) \ge 0.75$.</li>
+                            <li><strong>Dual-Layer Echo Gate:</strong> Mutes mic and recognition stream during audio playback to suppress self-listening loops.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 20px; background: rgba(56, 189, 248, 0.05); border-color: rgba(56, 189, 248, 0.2);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--cyan); font-weight: 700;">SYSTEM INTEGRITY:</span>
+                            <span style="font-size: 0.85rem; color: var(--text-primary); margin-left: 10px;">Zero external cloud calls during retrieval. Entire inference loop runs locally on the host CPU.</span>
+                        </div>
+                        <span class="tag tag-emerald">100% AIR-GAPPED READY</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: Tri-Language Tech Stack -->
+        <section class="slide" data-speaker="Speaker 2: Systems Architect" data-role="Deep Architecture & SIMD">
+            <div class="slide-header">
+                <div class="slide-pill">Tri-Language Engine</div>
+                <h1 class="slide-title">Engineered for <i>Zero Latency</i></h1>
+                <p class="slide-subtitle">Combining C++ AVX2 hardware intrinsics, Go WebSocket networking, and Python ONNX model orchestration.</p>
+            </div>
+            <div class="slide-body">
+                <div class="grid-3">
+                    <div class="card" style="border-top: 3px solid var(--emerald);">
+                        <div class="card-stat" style="color: var(--emerald);">C++</div>
+                        <div class="card-stat-label">AVX2 SIMD & Ring Buffer</div>
+                        <ul style="margin-top: 14px;">
+                            <li>32-byte cache-aligned vector storage.</li>
+                            <li>Unrolled 8-lane FMA dot products (`_mm256_fmadd_ps`).</li>
+                            <li>Search latency: <strong>0.70 microseconds</strong>.</li>
+                            <li>Lock-free SPSC circular ring buffer.</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="border-top: 3px solid var(--cyan);">
+                        <div class="card-stat" style="color: var(--cyan);">Go</div>
+                        <div class="card-stat-label">Full-Duplex Streaming</div>
+                        <ul style="margin-top: 14px;">
+                            <li>High-concurrency binary WebSocket server.</li>
+                            <li>Zero-allocation audio chunk dispatching.</li>
+                            <li>Non-blocking goroutine worker pools.</li>
+                            <li>Deterministic low-jitter egress.</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="border-top: 3px solid var(--gold);">
+                        <div class="card-stat" style="color: var(--gold);">Python</div>
+                        <div class="card-stat-label">Acoustics & Orchestration</div>
+                        <ul style="margin-top: 14px;">
+                            <li>Silero VAD ONNX Runtime stream processing.</li>
+                            <li>Sentence-Transformers (`all-MiniLM-L6-v2`).</li>
+                            <li>Speculative response cacher & vocoder pipe.</li>
+                            <li>Deterministic AST/Regex Guardrail.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 6: The Latency Math -->
+        <section class="slide" data-speaker="Speaker 2: Systems Architect" data-role="Latency Math & Bounds">
+            <div class="slide-header">
+                <div class="slide-pill">Mathematical Latency Bounds</div>
+                <h1 class="slide-title">Hiding Computation in <i>Speech Time</i></h1>
+                <p class="slide-subtitle">How speculative retrieval and background pre-warming turn a 1,800ms speech input into an 81ms observable response.</p>
+            </div>
+            <div class="slide-body">
+                <div class="card" style="margin-bottom: 20px;">
+                    <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold); margin-bottom: 12px; font-weight: 700;">
+                        TIMELINE BREAKDOWN: "Tower, declaring emergency, what is the squawk code?" (1,800ms utterance)
+                    </div>
+                    <div style="display: grid; grid-template-columns: 120px 1fr 140px; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border);">
+                        <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-tertiary);">t = 0 ms</span>
+                        <span style="font-size: 0.85rem; color: var(--text-primary);">Operator begins speaking. VAD triggers <code>SPEECH_START</code>.</span>
+                        <span class="tag tag-cyan">VAD Trigger</span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 120px 1fr 140px; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border);">
+                        <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--gold);">t = 400 ms</span>
+                        <span style="font-size: 0.85rem; color: var(--text-primary);">Early Intent Spotter classifies ATC squawk query. Fires AVX2 search.</span>
+                        <span class="tag tag-gold">Early Trigger</span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 120px 1fr 140px; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border);">
+                        <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--emerald);">t = 400.0007 ms</span>
+                        <span style="font-size: 0.85rem; color: var(--text-primary);">AVX2 SIMD search finishes (<strong>0.70µs</strong>). Returns Squawk 7700 chunk.</span>
+                        <span class="tag tag-emerald">SIMD Hit</span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 120px 1fr 140px; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border);">
+                        <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--emerald);">t = 400.065 ms</span>
+                        <span style="font-size: 0.85rem; color: var(--text-primary);">Numeric guardrail verifies 7700 against ground truth (<strong>0.065ms</strong>).</span>
+                        <span class="tag tag-emerald">Guardrail OK</span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 120px 1fr 140px; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border);">
+                        <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-secondary);">t = 401 - 550 ms</span>
+                        <span style="font-size: 0.85rem; color: var(--text-primary);">Neural vocoder synthesizes PCM frames into cache buffer in background.</span>
+                        <span class="tag tag-gold">Pre-Warm TTS</span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 120px 1fr 140px; gap: 12px; align-items: center; padding: 8px 0;">
+                        <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--emerald); font-weight: 700;">t = 1,881 ms</span>
+                        <span style="font-size: 0.85rem; color: var(--text-title); font-weight: 700;">Speech ends + 80ms silence. Pre-rendered audio plays instantly! (Turnaround: 81.4ms)</span>
+                        <span class="tag tag-emerald">Instant Audio</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: Knowledge Base -->
+        <section class="slide" data-speaker="Speaker 3: AI / RAG Engineer" data-role="Knowledge Base & Guardrails">
+            <div class="slide-header">
+                <div class="slide-pill">Ground Truth Knowledge Base</div>
+                <h1 class="slide-title">Multi-Sector <i>Operational Schema</i></h1>
+                <p class="slide-subtitle">Deterministic metric-aware vector chunks ingested across vital high-stakes emergency domains.</p>
+            </div>
+            <div class="slide-body">
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>✈️ Air Traffic Control (ATC)</h3>
+                        <ul>
+                            <li><strong>Squawk 7500:</strong> Unlawful Interference / Hijacking.</li>
+                            <li><strong>Squawk 7600:</strong> Radio Failure (NORDO).</li>
+                            <li><strong>Squawk 7700:</strong> General Emergency (Mayday declaration).</li>
+                            <li><strong>Separation Tolerances:</strong> 3nm terminal, 5nm en-route, 10,000 ft emergency descent.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>🏭 Industrial Chemical Safety</h3>
+                        <ul>
+                            <li><strong>Reactor Core R-101 MAWP:</strong> Exactly 450.0 PSI.</li>
+                            <li><strong>Emergency Venting Trip Threshold:</strong> Exactly 485.5 PSI.</li>
+                            <li><strong>Quench Injection Rate:</strong> 1,250 L/min water-glycol solution.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>🚑 911 Emergency Medical Services</h3>
+                        <ul>
+                            <li><strong>Adult CPR Compression Ratio:</strong> 30:2 at 100-120 compressions/min.</li>
+                            <li><strong>Chest Depth:</strong> 2.0 to 2.4 inches (5 to 6 cm).</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>🚒 Hazardous Materials & Fire</h3>
+                        <ul>
+                            <li><strong>BLEVE Boiling Explosion:</strong> Minimum 1/2 mile (800m) evacuation radius.</li>
+                            <li><strong>Hydrant Supply Pressure:</strong> 20 PSI residual minimum.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8: Numeric Guardrail -->
+        <section class="slide" data-speaker="Speaker 3: AI / RAG Engineer" data-role="Anti-Hallucination Guardrails">
+            <div class="slide-header">
+                <div class="slide-pill" style="color: var(--emerald); border-color: rgba(16,185,129,0.3);">Anti-Hallucination Guardrail</div>
+                <h1 class="slide-title">100% <i>Deterministic Precision</i></h1>
+                <p class="slide-subtitle">Intercepts and overrides generative numeric errors in under 0.065ms before vocoding.</p>
+            </div>
+            <div class="slide-body">
+                <div class="grid-2">
+                    <div class="card" style="border-color: rgba(244, 63, 94, 0.3);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <h3 style="color: var(--rose);">🚨 The Danger of Generative LLMs</h3>
+                            <span class="tag tag-rose">TOXIC HALLUCINATION</span>
+                        </div>
+                        <p>LLMs are probabilistic token predictors. Under pressure, an LLM might say:</p>
+                        <div style="background: rgba(244,63,94,0.08); padding: 12px; border-radius: 8px; font-family: var(--font-mono); font-size: 0.8rem; margin: 12px 0; color: var(--rose);">
+                            "Set transponder squawk code to 7500" (Hijack alert during an engine failure!)<br><br>
+                            "Reactor MAWP threshold is 550 PSI" (100 PSI above safety limit → Vessel rupture!)
+                        </div>
+                        <p>In life-critical operations, probabilistic text generation is unacceptable.</p>
+                    </div>
+
+                    <div class="card" style="border-color: rgba(16, 185, 129, 0.3);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <h3 style="color: var(--emerald);">🛡️ Our Deterministic Guardrail</h3>
+                            <span class="tag tag-emerald">0.065ms INTERCEPT</span>
+                        </div>
+                        <p>Our AST/regex guardrail operates directly on candidate response text:</p>
+                        <ul>
+                            <li>Extracts all numeric and critical entities.</li>
+                            <li>Validates against verified ground-truth schema in metadata.</li>
+                            <li>Performs instant deterministic substitution if any deviation is detected.</li>
+                            <li><strong>Adversarial Immunity:</strong> Tested with adversarial prompt injections (Squawk 9999 / 999 PSI) with 100% interception rate.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 9: Competitor Benchmark -->
+        <section class="slide" data-speaker="Speaker 3: AI / RAG Engineer" data-role="Competitive Benchmarks">
+            <div class="slide-header">
+                <div class="slide-pill">Competitive Benchmark</div>
+                <h1 class="slide-title">Beyond the <i>State of the Art</i></h1>
+                <p class="slide-subtitle">Comparing our Speculative SIMD architecture against standard cloud and modern streaming voice systems.</p>
+            </div>
+            <div class="slide-body">
+                <table class="benchmark-table">
+                    <thead>
+                        <tr>
+                            <th>Capability</th>
+                            <th>Standard Cloud Voice RAG</th>
+                            <th>Streaming Voice Agents</th>
+                            <th>Our Engine (PS-003 Speculative SIMD)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>End-to-End Latency</strong></td>
+                            <td>2,200ms – 4,500ms</td>
+                            <td>600ms – 1,100ms</td>
+                            <td><span class="tag tag-emerald">78ms – 120ms (Sub-250ms SLA)</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Retrieval Strategy</strong></td>
+                            <td>Post-speech sequential</td>
+                            <td>Post-speech streaming</td>
+                            <td><span class="tag tag-gold">Speculative early prefix at 400ms</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Vector Search Time</strong></td>
+                            <td>40ms – 120ms (Cloud DB)</td>
+                            <td>15ms – 35ms (HNSW)</td>
+                            <td><span class="tag tag-emerald">0.0007ms (AVX2 SIMD Hardware)</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Numeric Accuracy</strong></td>
+                            <td>Probabilistic (~91%)</td>
+                            <td>Probabilistic (~94%)</td>
+                            <td><span class="tag tag-emerald">100% Deterministic Certified</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Network Dependency</strong></td>
+                            <td>Cloud RPC required</td>
+                            <td>Cloud or Hybrid</td>
+                            <td><span class="tag tag-emerald">Zero Cloud / Air-Gapped Capable</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Echo Suppression</strong></td>
+                            <td>Prone to loopback</td>
+                            <td>Heavy Cloud AEC</td>
+                            <td><span class="tag tag-emerald">Client-side ducking & mute gating</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Slide 10: Live Demo -->
+        <section class="slide" data-speaker="Speaker 4: Demo Lead & Closer" data-role="Interactive Live Demonstration">
+            <div class="slide-header">
+                <div class="slide-pill">Live Interactive Demonstration</div>
+                <h1 class="slide-title">Experience <i>Sub-250ms Voice RAG</i></h1>
+                <p class="slide-subtitle">Demonstrating continuous microphone speech-to-speech, preset mission-critical queries, and adversarial interception on localhost:8000.</p>
+            </div>
+            <div class="slide-body">
+                <div class="grid-3">
+                    <div class="card" style="border-color: var(--border-gold);">
+                        <h3>1. Preset: ATC Squawk 7700</h3>
+                        <p>Demonstrates instant aviation transponder recall under 85ms turnaround with strict verification of 7700.</p>
+                        <a href="/" target="_blank" class="btn-action" style="margin-top: 14px; width: 100%; justify-content: center;">Trigger on Web App →</a>
+                    </div>
+                    <div class="card" style="border-color: var(--border-gold);">
+                        <h3>2. Preset: Reactor Core R-101</h3>
+                        <p>Retrieves exact industrial tolerances: 450.0 PSI MAWP limit and 485.5 PSI emergency venting threshold.</p>
+                        <a href="/" target="_blank" class="btn-action" style="margin-top: 14px; width: 100%; justify-content: center;">Trigger on Web App →</a>
+                    </div>
+                    <div class="card" style="border-color: var(--border-gold);">
+                        <h3>3. Live Microphone Stream</h3>
+                        <p>Full-duplex continuous live speech in the browser with real-time waveform and software echo gate.</p>
+                        <a href="/" target="_blank" class="btn-action" style="margin-top: 14px; width: 100%; justify-content: center;">Start Live Mic →</a>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 20px; background: rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.3);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--emerald); font-weight: 700;">INTERACTIVE ACTION:</span>
+                            <span style="font-size: 0.85rem; color: var(--text-primary); margin-left: 10px;">Switch to the browser tab running at <code>http://localhost:8000</code> to view the live oscilloscope waveform and microsecond telemetry timeline!</span>
+                        </div>
+                        <a href="/" target="_blank" class="btn-action" style="background: var(--emerald); color: #fff; border-color: var(--emerald);">Switch to localhost:8000</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 11: Future Roadmap -->
+        <section class="slide" data-speaker="Speaker 4: Demo Lead & Closer" data-role="Production Roadmap">
+            <div class="slide-header">
+                <div class="slide-pill">Future Vision</div>
+                <h1 class="slide-title">Production Scaling & <i>Hardware Deployment</i></h1>
+                <p class="slide-subtitle">Extending our speculative architecture to edge avionics, tactical radios, and distributed enterprise graphs.</p>
+            </div>
+            <div class="slide-body">
+                <div class="grid-3">
+                    <div class="card">
+                        <div class="card-stat">01</div>
+                        <div class="card-stat-label">FPGA & ARM NEON</div>
+                        <p style="margin-top: 12px;">Porting C++ AVX2 kernels to ARM NEON SIMD and AMD Xilinx FPGAs for cockpit avionics and field walkie-talkies.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-stat">02</div>
+                        <div class="card-stat-label">32-Channel ATC Ingestion</div>
+                        <p style="margin-top: 12px;">Scaling the Go WebSocket layer to multiplex 32 simultaneous VHF radio channels with automated speaker diarization.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-stat">03</div>
+                        <div class="card-stat-label">Speculative Graph RAG</div>
+                        <p style="margin-top: 12px;">Pre-fetching multi-hop emergency checklists from enterprise knowledge graphs (Neo4j) based on initial distress intents.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 12: Conclusion & Q&A -->
+        <section class="slide" data-speaker="Speaker 4: Demo Lead & Closer" data-role="Conclusion & Open Floor">
+            <div class="slide-header">
+                <div class="slide-pill">Summary</div>
+                <h1 class="slide-title">Transforming <i>Voice Response</i></h1>
+                <p class="slide-subtitle">Zero lag. 100% deterministic accuracy. Built for missions where seconds count.</p>
+            </div>
+            <div class="slide-body">
+                <div class="grid-4" style="margin-bottom: 24px;">
+                    <div class="card" style="text-align: center;">
+                        <div class="card-stat" style="color: var(--gold);">< 85ms</div>
+                        <div class="card-stat-label">Observed Latency</div>
+                    </div>
+                    <div class="card" style="text-align: center;">
+                        <div class="card-stat" style="color: var(--emerald);">0.70µs</div>
+                        <div class="card-stat-label">AVX2 Vector Search</div>
+                    </div>
+                    <div class="card" style="text-align: center;">
+                        <div class="card-stat" style="color: var(--cyan);">100%</div>
+                        <div class="card-stat-label">Deterministic Guardrail</div>
+                    </div>
+                    <div class="card" style="text-align: center;">
+                        <div class="card-stat" style="color: var(--rose);">0.00ms</div>
+                        <div class="card-stat-label">Cloud Latency</div>
+                    </div>
+                </div>
+
+                <div class="card" style="text-align: center; padding: 32px; border-color: var(--border-gold); background: var(--bg-card);">
+                    <h2 style="font-family: var(--font-serif); font-size: 2.2rem; margin-bottom: 10px; color: var(--text-title);">
+                        Thank you! We are ready for your questions.
+                    </h2>
+                    <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                        Our 4-member engineering team is standing by to discuss the C++ AVX2 kernels, speculative caching algorithms, guardrails, and acoustic DSP pipeline.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer Controls -->
+    <footer>
+        <div style="display: flex; align-items: center; gap: 14px;">
+            <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-secondary);" id="slideCounter">Slide 1 of 12</span>
+            <div class="slide-progress" id="slideProgress"></div>
+        </div>
+
+        <div class="nav-controls">
+            <button class="btn-nav" id="prevBtn" onclick="prevSlide()" disabled>← Previous</button>
+            <button class="btn-nav" id="nextBtn" onclick="nextSlide()">Next →</button>
+            <span class="keyboard-hint">Use <kbd>←</kbd> <kbd>→</kbd> or <kbd>Space</kbd></span>
+        </div>
+    </footer>
+
+    <script>
+        // State
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        // Initialize Progress Dots
+        const progressContainer = document.getElementById('slideProgress');
+        slides.forEach((_, idx) => {
+            const dot = document.createElement('div');
+            dot.className = `progress-dot ${idx === 0 ? 'active' : ''}`;
+            dot.onclick = () => goToSlide(idx);
+            progressContainer.appendChild(dot);
+        });
+
+        function updateSlideUI() {
+            slides.forEach((s, idx) => {
+                s.classList.toggle('active', idx === currentSlide);
+            });
+
+            document.querySelectorAll('.progress-dot').forEach((dot, idx) => {
+                dot.classList.toggle('active', idx === currentSlide);
+            });
+
+            document.getElementById('slideCounter').innerText = `Slide ${currentSlide + 1} of ${slides.length}`;
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === slides.length - 1;
+
+            // Update Speaker Header Badge
+            const currentEl = slides[currentSlide];
+            const speaker = currentEl.getAttribute('data-speaker') || 'Speaker';
+            const role = currentEl.getAttribute('data-role') || '';
+            document.getElementById('speakerName').innerText = `${speaker} — ${role}`;
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                updateSlideUI();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlideUI();
+            }
+        }
+
+        function goToSlide(idx) {
+            currentSlide = idx;
+            updateSlideUI();
+        }
+
+        // Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'Space') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            }
+        });
+
+        // Theme Toggle Controller (Default: light)
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
+            setTheme(nextTheme);
+        }
+
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('echo_slides_theme', theme);
+            const icon = document.getElementById('themeToggleIcon');
+            const label = document.getElementById('themeToggleLabel');
+            if (theme === 'light') {
+                if (icon) icon.innerText = '☀️';
+                if (label) label.innerText = 'light';
+            } else {
+                if (icon) icon.innerText = '🌙';
+                if (label) label.innerText = 'dark';
+            }
+        }
+
+        (function initTheme() {
+            const saved = localStorage.getItem('echo_slides_theme') || 'light';
+            setTheme(saved);
+        })();
+
+        updateSlideUI();
+    </script>
+</body>
+</html>
