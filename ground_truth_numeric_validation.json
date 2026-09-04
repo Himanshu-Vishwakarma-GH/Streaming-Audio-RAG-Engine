@@ -1,0 +1,19 @@
+[
+  {
+    "query_id": "q1",
+    "audio_file": "query_01_atc_squawk.wav",
+    "intent": "transponder_squawk_code",
+    "expected_numeric_values": [
+      7700
+    ]
+  },
+  {
+    "query_id": "q2",
+    "audio_file": "query_02_reactor_pressure.wav",
+    "intent": "reactor_mawp_threshold",
+    "expected_numeric_values": [
+      450.0,
+      485.5
+    ]
+  }
+]
