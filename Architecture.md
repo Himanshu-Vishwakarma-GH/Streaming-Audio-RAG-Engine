@@ -80,6 +80,7 @@
 ## 2. Technical Component Specifications
 
 ### 2.1 Networking & Audio Protocol (Go)
+* **Underlying Library:** [coder/websocket](https://github.com/coder/websocket) (High-performance, zero-allocation Go WebSockets).
 * **Protocol:** Binary WebSocket (`ws://` / `wss://`).
 * **Audio Format:**
   * Sample Rate: 16,000 Hz
@@ -92,7 +93,7 @@
 ---
 
 ### 2.2 Lock-Free SPSC Circular Ring Buffer (C++)
-To guarantee zero stuttering and thread-safety between the network ingestion thread and inference consumer:
+To guarantee zero stuttering and thread-safety between the network ingestion thread and inference consumer (inspired by [cameron314/readerwriterqueue](https://github.com/cameron314/readerwriterqueue)):
 * **Algorithm:** Single-Producer Single-Consumer (SPSC) circular queue.
 * **Memory Alignment:** Struct members aligned to `alignas(64)` (64-byte CPU cache lines) to prevent cache invalidation between CPU cores.
 * **Layout:**
@@ -116,7 +117,8 @@ To guarantee zero stuttering and thread-safety between the network ingestion thr
 ---
 
 ### 2.3 SIMD-Accelerated Vector Search (C++ AVX2)
-* **Embedding Model:** `sentence-transformers/all-MiniLM-L6-v2` (384-dimensional dense vectors).
+* **Embedding Model:** `sentence-transformers/all-MiniLM-L6-v2` via [UKPLab/sentence-transformers](https://github.com/UKPLab/sentence-transformers) (384-dimensional dense vectors).
+* **SIMD Kernel Inspiration:** Handcrafted AVX2 FMA based on [ashvardanian/simsimd](https://github.com/ashvardanian/simsimd) and [unum-cloud/usearch](https://github.com/unum-cloud/usearch).
 * **Memory Organization:** Contiguous, flat memory block allocated via `_aligned_malloc(size, 32)`:
   $$\mathbf{M} \in \mathbb{R}^{N \times 384}, \quad N = \text{number of manual chunks}$$
 * **Hardware Acceleration:** Unrolled AVX2 FMA (`_mm256_fmadd_ps`) with two parallel accumulators to maximize CPU instruction-level parallelism (ILP):
@@ -185,7 +187,7 @@ The anti-hallucination guardrail is an AST/Regex deterministic validation layer 
 ---
 
 ### 2.6 Streaming Neural Vocoder / TTS
-* **Engine:** Piper TTS (VITS architecture ONNX).
-* **Execution:** Direct CPU forward-pass using ONNX Runtime with AVX2 thread pool.
+* **Engine:** Piper TTS (VITS architecture ONNX) via [rhasspy/piper](https://github.com/rhasspy/piper).
+* **Execution:** Direct CPU forward-pass using ONNX Runtime ([microsoft/onnxruntime](https://github.com/microsoft/onnxruntime)) with AVX2 thread pool.
 * **Output:** 16kHz 16-bit mono PCM.
-* **Pre-Rendering:** Synthesizes the first sentence while the user is still finishing speaking, holding the first 640-byte packet in a memory buffer ready for immediate wire release.
+* **Pre-Rendering:** Synthesizes the first sentence while the user is still finishing speaking, holding the first 640-byte packet in a memory buffer ready for immediate wire release (pattern adapted from [NVIDIA/voice-agent-examples](https://github.com/NVIDIA/voice-agent-examples)).

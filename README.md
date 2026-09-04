@@ -33,11 +33,20 @@ Our engine executes retrieval **speculatively while the user is still speaking**
 
 ---
 
-## 🛠️ Tri-Language Tech Stack
+## 🛠️ Tri-Language Tech Stack & Open-Source References
 
-* **C++ (AVX2 / SIMD):** Hardware-vectorized dot-product search (`_mm256_fmadd_ps`), cache-aligned manual index, and lock-free SPSC ring buffer.
-* **Go:** High-concurrency binary WebSocket server for full-duplex 16kHz PCM audio streaming.
-* **Python:** Acoustic feature processing, Silero VAD, speculative early-intent classifier, deterministic numeric guardrail, and automated benchmark evaluation runner.
+* **C++ (AVX2 / SIMD & Data Structures):**
+  * Hardware-vectorized dot-product search with `_mm256_fmadd_ps` inspired by [ashvardanian/simsimd](https://github.com/ashvardanian/simsimd) and [unum-cloud/usearch](https://github.com/unum-cloud/usearch).
+  * Lock-free Single-Producer Single-Consumer (SPSC) circular ring buffer architecture based on [cameron314/readerwriterqueue](https://github.com/cameron314/readerwriterqueue).
+* **Go (Concurrent Networking Layer):**
+  * High-concurrency binary WebSocket server for full-duplex 16kHz PCM audio streaming powered by [coder/websocket](https://github.com/coder/websocket) (formerly nhooyr/websocket).
+* **Python (Acoustics, Models & Pipeline Orchestration):**
+  * Streaming Voice Activity Detection (VAD) using [snakers4/silero-vad](https://github.com/snakers4/silero-vad).
+  * Offline streaming speech recognition & vocoder runtime based on [k2-fsa/sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx).
+  * Ultra-low-latency neural text-to-speech synthesis using [rhasspy/piper](https://github.com/rhasspy/piper).
+  * Dense vector embeddings using [UKPLab/sentence-transformers](https://github.com/UKPLab/sentence-transformers).
+  * Cross-platform hardware acceleration via [microsoft/onnxruntime](https://github.com/microsoft/onnxruntime).
+  * Speculative execution and predictive caching patterns adapted from [SalesforceAIResearch/VoiceAgentRAG](https://github.com/SalesforceAIResearch/VoiceAgentRAG) and [NVIDIA/voice-agent-examples](https://github.com/NVIDIA/voice-agent-examples).
 
 ---
 
@@ -46,3 +55,4 @@ Our engine executes retrieval **speculatively while the user is still speaking**
 Evaluated against `ground_truth_numeric_validation.json`:
 * **Query 1 (`audio_samples/query_01_atc_squawk.wav`):** General Emergency squawk code strictly validated to **`7700`**.
 * **Query 2 (`audio_samples/query_02_reactor_pressure.wav`):** Reactor Core R-101 MAWP strictly validated to **`450.0 PSI`** and Emergency Venting threshold to **`485.5 PSI`**.
+

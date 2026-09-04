@@ -98,16 +98,20 @@
 ## 6. 🛠️ Mandatory Language & Toolchain Compliance
 
 - [ ] **C++ Component:**
-  - [ ] High-speed SIMD-vectorized vector search (AVX2).
-  - [ ] Fast ring buffer / data structures.
+  - [ ] High-speed SIMD-vectorized vector search (AVX2 using `_mm256_fmadd_ps` based on [ashvardanian/simsimd](https://github.com/ashvardanian/simsimd) / [unum-cloud/usearch](https://github.com/unum-cloud/usearch)).
+  - [ ] Fast lock-free circular ring buffer ([cameron314/readerwriterqueue](https://github.com/cameron314/readerwriterqueue)).
   - [ ] Deterministic validator / string parser.
 
 - [ ] **Networking Component (Go / Concurrent WebSocket layer):**
-  - [ ] Concurrent streaming WebSocket / IPC server for low-overhead audio transport.
+  - [ ] Concurrent streaming WebSocket / IPC server for low-overhead audio transport using [coder/websocket](https://github.com/coder/websocket).
 
 - [ ] **Python Component:**
-  - [ ] Acoustic feature processing & speech models.
+  - [ ] Acoustic feature processing & VAD ([snakers4/silero-vad](https://github.com/snakers4/silero-vad)).
+  - [ ] Neural vocoder / streaming TTS ([rhasspy/piper](https://github.com/rhasspy/piper) & [k2-fsa/sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx)).
+  - [ ] Dense text embedding models ([UKPLab/sentence-transformers](https://github.com/UKPLab/sentence-transformers)).
+  - [ ] Speculative caching patterns ([SalesforceAIResearch/VoiceAgentRAG](https://github.com/SalesforceAIResearch/VoiceAgentRAG) & [NVIDIA/voice-agent-examples](https://github.com/NVIDIA/voice-agent-examples)).
   - [ ] Pipeline orchestration & benchmark evaluation runner.
+
 
 ---
 

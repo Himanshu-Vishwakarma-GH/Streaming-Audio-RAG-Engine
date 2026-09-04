@@ -35,11 +35,11 @@
 
 ### Tasks:
 1. Parse `manuals/atc_emergency_manual.md` into semantic chunks (Altitude/Separation, Transponder Squawk codes, Reactor MAWP/Venting).
-2. Generate 384-dimensional dense embeddings using `all-MiniLM-L6-v2`.
+2. Generate 384-dimensional dense embeddings using `all-MiniLM-L6-v2` via [UKPLab/sentence-transformers](https://github.com/UKPLab/sentence-transformers).
 3. Implement `simd_engine.cpp`:
    - Cache-aligned in-memory vector storage (`_aligned_malloc`).
-   - Unrolled AVX2 FMA dot-product kernel (`_mm256_fmadd_ps`).
-   - SPSC lock-free audio ring buffer struct.
+   - Unrolled AVX2 FMA dot-product kernel (`_mm256_fmadd_ps`) inspired by [ashvardanian/simsimd](https://github.com/ashvardanian/simsimd).
+   - SPSC lock-free audio ring buffer struct inspired by [cameron314/readerwriterqueue](https://github.com/cameron314/readerwriterqueue).
 4. Compile native dynamic library with MSYS2 `g++`:
    ```bash
    g++ -O3 -mavx2 -mfma -shared -o simd_engine.dll simd_engine.cpp
@@ -63,10 +63,10 @@
 
 ### Tasks:
 1. Implement `streaming_ws.go`:
-   - WebSocket listener accepting binary 16kHz 16-bit PCM frames (20ms / 640 bytes).
+   - WebSocket listener using [coder/websocket](https://github.com/coder/websocket) accepting binary 16kHz 16-bit PCM frames (20ms / 640 bytes).
    - Low-overhead memory handoff using `sync.Pool`.
 2. Connect Go network stream to the C++ SPSC ring buffer without thread blocking.
-3. Integrate Silero VAD (ONNX Runtime) in Python to continuously track speech boundaries with an aggressive 80ms silence endpointing timeout.
+3. Integrate Silero VAD ([snakers4/silero-vad](https://github.com/snakers4/silero-vad)) via ONNX Runtime in Python to continuously track speech boundaries with an aggressive 80ms silence endpointing timeout.
 
 ### Deliverables:
 * `streaming_ws.go`
@@ -126,8 +126,8 @@
 * **Objective:** Pre-synthesize the verified response into raw 16kHz PCM audio while the user is finishing speaking and release it on silence.
 
 ### Tasks:
-1. Integrate Piper TTS (VITS ONNX) in `tts_streamer.py`.
-2. Implement speculative response caching:
+1. Integrate Piper TTS via [rhasspy/piper](https://github.com/rhasspy/piper) (VITS ONNX architecture) in `tts_streamer.py`.
+2. Implement speculative response caching (adapting [NVIDIA/voice-agent-examples](https://github.com/NVIDIA/voice-agent-examples)):
    - As soon as the draft response is verified, start synthesizing the first audio frame into a memory buffer.
    - When VAD triggers Speech-Off ($80\text{ms}$ silence), immediately flush the pre-rendered audio packets to the client.
 3. Validate total post-speech turnaround latency ($T_{\text{post-speech}} < 250\text{ms}$).

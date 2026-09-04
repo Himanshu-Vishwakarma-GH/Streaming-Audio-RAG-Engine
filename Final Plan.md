@@ -54,6 +54,15 @@ As mandated by the problem statement:
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
+### Open-Source Repositories & Algorithmic Foundations
+* **SIMD Kernel & Vector Math:** [ashvardanian/simsimd](https://github.com/ashvardanian/simsimd) & [unum-cloud/usearch](https://github.com/unum-cloud/usearch)
+* **Lock-Free Audio Queue:** [cameron314/readerwriterqueue](https://github.com/cameron314/readerwriterqueue)
+* **Concurrent Networking:** [coder/websocket](https://github.com/coder/websocket)
+* **Streaming VAD:** [snakers4/silero-vad](https://github.com/snakers4/silero-vad)
+* **Streaming TTS & Vocoder:** [rhasspy/piper](https://github.com/rhasspy/piper) & [k2-fsa/sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx)
+* **Embedding Model:** [UKPLab/sentence-transformers](https://github.com/UKPLab/sentence-transformers)
+* **Predictive Caching & Speculative RAG:** [SalesforceAIResearch/VoiceAgentRAG](https://github.com/SalesforceAIResearch/VoiceAgentRAG) & [NVIDIA/voice-agent-examples](https://github.com/NVIDIA/voice-agent-examples)
+
 ---
 
 ## 3. Benchmark Dataset & Ground Truth Alignment

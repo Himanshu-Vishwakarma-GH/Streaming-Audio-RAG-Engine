@@ -30,6 +30,18 @@
 * **Node.js:** v24.0.0
 * **Go Compiler:** Can be invoked / targeted via Go toolchain for networking server.
 
+### 🌐 Open-Source Dependency Links (Always Available in Memory):
+* **[snakers4/silero-vad](https://github.com/snakers4/silero-vad):** Pre-trained enterprise VAD (<1ms frame inference).
+* **[rhasspy/piper](https://github.com/rhasspy/piper):** Fast offline neural TTS (VITS ONNX architecture).
+* **[k2-fsa/sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx):** Unified Next-Gen Kaldi offline speech runtime.
+* **[ashvardanian/simsimd](https://github.com/ashvardanian/simsimd):** SIMD vector distance kernels (AVX2/AVX-512).
+* **[unum-cloud/usearch](https://github.com/unum-cloud/usearch):** Minimalist vector search engine.
+* **[cameron314/readerwriterqueue](https://github.com/cameron314/readerwriterqueue):** Lock-free SPSC circular queue for C++.
+* **[coder/websocket](https://github.com/coder/websocket):** Ultra-low-allocation Go WebSocket library.
+* **[UKPLab/sentence-transformers](https://github.com/UKPLab/sentence-transformers):** Fast dense vector embedding models.
+* **[SalesforceAIResearch/VoiceAgentRAG](https://github.com/SalesforceAIResearch/VoiceAgentRAG):** Dual-agent speculative voice caching.
+* **[NVIDIA/voice-agent-examples](https://github.com/NVIDIA/voice-agent-examples):** Speculative speech processing and TTS response cacher.
+
 ---
 
 ## 3. 🎯 Benchmark Ground Truth & Verification Targets

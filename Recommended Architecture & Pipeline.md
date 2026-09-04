@@ -107,6 +107,15 @@ Timeline:
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
+### 🔗 Open-Source Repositories Powering Each Layer:
+* **Networking (Go WebSockets):** [coder/websocket](https://github.com/coder/websocket)
+* **Audio Buffer (C++ SPSC Ring Buffer):** [cameron314/readerwriterqueue](https://github.com/cameron314/readerwriterqueue)
+* **Streaming VAD:** [snakers4/silero-vad](https://github.com/snakers4/silero-vad)
+* **SIMD Vector Acceleration:** [ashvardanian/simsimd](https://github.com/ashvardanian/simsimd) & [unum-cloud/usearch](https://github.com/unum-cloud/usearch)
+* **Dense Text Embeddings:** [UKPLab/sentence-transformers](https://github.com/UKPLab/sentence-transformers)
+* **Streaming Neural Vocoder (TTS):** [rhasspy/piper](https://github.com/rhasspy/piper)
+* **Speculative RAG & Caching Patterns:** [SalesforceAIResearch/VoiceAgentRAG](https://github.com/SalesforceAIResearch/VoiceAgentRAG) & [NVIDIA/voice-agent-examples](https://github.com/NVIDIA/voice-agent-examples)
+
 ---
 
 ## 3. What is Covered vs. What is Left Out
